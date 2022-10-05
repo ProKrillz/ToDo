@@ -1,0 +1,15 @@
+﻿@page
+@model ErrorModel
+@{
+    ViewData["Title"] = "Error";
+}
+
+<div class="d-flex align-items-center justify-content-center vh-100">
+    <div class="text-center">
+        <h1 class="display-1 fw-bold"><span class="text-danger">Opps!</span> Error.</h1>
+        <p class="lead">
+            An error occurred while processing your request 
+        </p>
+        <a asp-page="Index" class="btn btn-primary">Go Home</a>
+    </div>
+</div>
