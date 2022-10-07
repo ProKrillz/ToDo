@@ -1,0 +1,17 @@
+﻿@page
+@model ToDo.Pages.LoginSiteModel
+@{
+}
+<form class="position-absolute top-20 start-50 translate-middle-x col-4" asp-page-handler="LoginUser" method="post">
+    <h2 class="position-relative start-50 translate-middle-x">Login</h2>
+ 
+    <div class="mb-3">
+        <label class="form-label">Username</label>
+        <input type="text" class="form-control" asp-for="Username" required>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Password</label>
+        <input type="password" class="form-control" asp-for="Password" required>
+    </div>
+    <input type="submit" value="Login"/>
+</form>

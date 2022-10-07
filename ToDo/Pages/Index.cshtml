@@ -51,9 +51,9 @@
                             <div class="mb-2">
                                 <label for="addPrior" class="form-label">Priority: </label>
                                 <select id="addPrior" class="form-select" asp-for="Priority">
-                                    <option value="0">Low</option>
-                                    <option value="1" selected>Normal</option>
-                                    <option value="2">High</option>
+                                    <option value="1">Low</option>
+                                    <option value="2" selected>Normal</option>
+                                    <option value="3">High</option>
                                 </select>
                                 <span asp-validation-for="Priority"></span>
                             </div>
@@ -172,19 +172,19 @@
                                                         @switch (item.TaskPriority)
                                                         {
                                                             case ToDoTask.Priority.Low:
-                                                                <option value="0" selected>Low</option>
-                                                                <option value="1">Normal</option>
-                                                                <option value="2">High</option>
+                                                                <option value="1" selected>Low</option>
+                                                                <option value="2">Normal</option>
+                                                                <option value="3">High</option>
                                                                 break;
                                                             case ToDoTask.Priority.Normal:
-                                                                <option value="0">Low</option>
-                                                                <option value="1" selected>Normal</option>
-                                                                <option value="2">High</option>
+                                                                <option value="1">Low</option>
+                                                                <option value="2" selected>Normal</option>
+                                                                <option value="3">High</option>
                                                                 break;
                                                             case ToDoTask.Priority.High:
-                                                                <option value="0">Low</option>
-                                                                <option value="1">Normal</option>
-                                                                <option value="2" selected>High</option>
+                                                                <option value="1">Low</option>
+                                                                <option value="2">Normal</option>
+                                                                <option value="3" selected>High</option>
                                                                 break;
                                                         }
                                                     </select>
@@ -305,19 +305,19 @@
                                                         @switch (item.TaskPriority)
                                                         {
                                                             case ToDoTask.Priority.Low:
-                                                                <option value="0" selected>Low</option>
-                                                                <option value="1">Normal</option>
-                                                                <option value="2">High</option>
+                                                                <option value="1" selected>Low</option>
+                                                                <option value="2">Normal</option>
+                                                                <option value="3">High</option>
                                                                 break;
                                                             case ToDoTask.Priority.Normal:
-                                                                <option value="0">Low</option>
-                                                                <option value="1" selected>Normal</option>
-                                                                <option value="2">High</option>
+                                                                <option value="1">Low</option>
+                                                                <option value="2" selected>Normal</option>
+                                                                <option value="3">High</option>
                                                                 break;
                                                             case ToDoTask.Priority.High:
-                                                                <option value="0">Low</option>
-                                                                <option value="1">Normal</option>
-                                                                <option value="2" selected>High</option>
+                                                                <option value="1">Low</option>
+                                                                <option value="2">Normal</option>
+                                                                <option value="3" selected>High</option>
                                                                 break;
                                                         }
                                                     </select>

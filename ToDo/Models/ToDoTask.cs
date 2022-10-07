@@ -6,7 +6,6 @@ namespace ToDo.Models
     public record ToDoTask
     {
         public Guid GUID { get; set; }
-        public int Id { get; init; }
 
         public string? Title { get; set; }
 
@@ -21,11 +20,9 @@ namespace ToDo.Models
 
         public ToDoTask() { }
 
-        public ToDoTask(int id, string title, string description, Priority priority, DateTime created)
+        public ToDoTask( string title, string description, Priority priority)
         {
             GUID = Guid.NewGuid();
-            Id = id;
-            Created = created;
             Title = title;
             Description = description;
             TaskPriority = priority;

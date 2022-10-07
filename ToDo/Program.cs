@@ -3,9 +3,13 @@ using ToDo.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
 // Add services to the container.
 builder.Services.AddRazorPages().
-    Services.AddSingleton<ITaskRepo, TaskRepo>();
+    Services.AddSingleton<ITaskRepo, TaskRepo>().
+    AddSingleton<IUserRepo, UserRepo>().
+    AddSession(option => { option.IdleTimeout = TimeSpan.FromMinutes(30); });
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -21,7 +25,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-
+app.UseSession();
 app.UseAuthorization();
 
 app.MapRazorPages();

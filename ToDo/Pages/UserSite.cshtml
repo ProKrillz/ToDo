@@ -1,0 +1,186 @@
+﻿@page
+@model ToDo.Pages.UserSiteModel
+@using ToDo.Models
+@{
+}
+<p>@Model.UserLogin.FirstName</p>
+<p>@Model.UserLogin.LastName</p>
+
+  <li class="nav-item d-flex justify-content-end col-6">
+    <button class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#NewTaskModal">New Task</button>
+  </li>
+  <form asp-page-handler="Delete" method="post">
+      <input type="submit" value="Delete User"/>
+  </form>
+
+<form method="post" asp-page-handler="Add">
+    <div class="modal fade" id="NewTaskModal" tabindex="-1" aria-labelledby="NewTaskModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="NewTaskModalLabel">New Task</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div asp-validation-summary="ModelOnly"></div>
+                    <div class="mb-2">
+                        <label for="addTitle" class="form-label">Title: </label>
+                        <input required id="addTitle" class="form-control" type="text" asp-for="Title" />
+                        <span asp-validation-for="Title"></span>
+                    </div>
+                    <div class="mb-2">
+                        <label for="addDesc" class="form-label">Description: </label>
+                        <input required id="addDesc" class="form-control type="text" asp-for="Description" />
+                        <span asp-validation-for="Description"></span>
+                    </div>
+                    <div class="mb-2">
+                        <label for="addPrior" class="form-label">Priority: </label>
+                        <select id="addPrior" class="form-select" asp-for="Priority">
+                            <option value="1">Low</option>
+                            <option value="2" selected>Normal</option>
+                            <option value="3">High</option>
+                        </select>
+                        <span asp-validation-for="Priority"></span>
+                    </div>
+                </div>
+                <div class="modal-footer d-flex justify-content-between">
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-warning text-white">Add task</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+
+<div id="Pending" class="collapse show">
+    <h3 class="mt-4 mb-4">Pending Tasks</h3>
+    <div class="d-flex justify-content-center justify-content-sm-evenly justify-content-lg-start flex-wrap gap-4 row">
+
+        @foreach (ToDoTask item in Model.ToDoTasks)
+        {
+            @if (!item.IsCompleted)
+            {
+                <div class="card p-0 mb-5 col-8 col-sm-5 col-lg-3 col-xl-2 border border-2 border-dark shadow">
+
+                    <div class="card-header @item.TaskPriority">
+                        <div class="row">
+                            <div class="col-4 d-flex justify-content-center align-content-center">
+                                <button type="button" data-bs-toggle="modal" data-bs-target="#pDeleteTaskModal" class="btn text-white fw-bold">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-trash3" viewBox="0 0 16 16">
+                                        <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5ZM11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59 0 0 0-.01 0H11Zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5h9.916Zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47ZM8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5Z" />
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="modal fade" id="pDeleteTaskModal" tabindex="-1" aria-labelledby="pDeleteTaskModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title text-black" id="pDeleteTaskModalLabel">Delete Task</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body d-flex justify-content-center">
+                                            <div class="card p-0 mb-5 col-6 border border-2 border-dark shadow">
+                                                <div class="card-header @item.TaskPriority text-white ">
+                                                    <div class="d-flex flex-column justify-content-center align-content-center">
+                                                        <h5 class="text-white card-title text-center m-0">@item.Title</h5>
+                                                    </div>
+                                                </div>
+                                                <div class="card-body text-center">
+                                                    <p class="text-black">@item.Description</p>
+                                                    <h5><span class="badge @item.TaskPriority">@item.TaskPriority</span></h5>
+                                                    <p class="text-black">@item.Created.ToString("d")</p>
+                                                </div>
+                                                <div class="card-footer">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer d-flex justify-content-between">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                            <form asp-page-handler="DeleteTask" asp-route-guid="@item.GUID" method="post">
+                                                <button type="submit" class="btn btn-danger text-white">Confirm</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-4 d-flex flex-column justify-content-center align-content-center">
+                                <h5 class="text-white card-title text-center m-0">@item.Title</h5>
+                            </div>
+                            <div class="col-4"></div>
+                        </div>
+                    </div>
+
+                    <div class="card-body text-center">
+                        <p>@item.Description</p>
+                        <h5><span class="badge @item.TaskPriority">@item.TaskPriority</span></h5>
+                        <p>@item.Created.ToString("d")</p>
+                    </div>
+
+                    <div class="card-footer d-flex justify-content-between">
+                        <button type="button" class="btn btn-outline-warning text-black d-inline-block col-5 " data-bs-toggle="modal" data-bs-target="#EditTaskModal">Edit</button>
+                        <form class="d-inline-block" method="post" asp-page-handler="Complete" asp-route-guid="@item.GUID">
+                            <button type="submit" class="btn btn-outline-dark text-white @item.TaskPriority">Complete</button>
+                        </form>
+                    </div>
+
+                    <!-- EditTaskModal -->
+                    <form method="post" asp-page-handler="Edit" asp-route-guid="@item.GUID">
+                        <div class="modal fade" id="EditTaskModal" tabindex="-1" aria-labelledby="EditTaskModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="EditTaskModalLabel">Edit Task</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="mb-2">
+                                            <label for="pEditTitle" class="form-label">Title: </label>
+                                            <input id="pEditTitle" class="form-control" type="text" asp-for="Title" />
+                                        </div>
+                                        <div class="mb-2">
+                                            <label for="pEditDesc" class="form-label">Description: </label>
+                                            <input id="pEditDesc" class="form-control type="text" asp-for="Description" />
+                                        </div>
+                                        <div class="mb-2">
+                                            <label for="pEditPrior" class="form-label">Priority: </label>
+                                            <select id="pEditPrior" class="form-select" asp-for="Priority">
+                                                @switch (item.TaskPriority)
+                                                {
+                                                    case ToDoTask.Priority.Low:
+                                                        <option value="1" selected>Low</option>
+                                                        <option value="2">Normal</option>
+                                                        <option value="3">High</option>
+                                                        break;
+                                                    case ToDoTask.Priority.Normal:
+                                                        <option value="1">Low</option>
+                                                        <option value="2" selected>Normal</option>
+                                                        <option value="3">High</option>
+                                                        break;
+                                                    case ToDoTask.Priority.High:
+                                                        <option value="1">Low</option>
+                                                        <option value="2">Normal</option>
+                                                        <option value="3" selected>High</option>
+                                                        break;
+                                                }
+                                            </select>
+                                        </div>
+                                        <div class="form-check mt-3">
+                                            <label for="cEditComp" class="form-check-label">Completed</label>
+                                            <input id="cEditComp" class="form-check-input" type="checkbox" asp-for="IsCompleted" />
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer d-flex justify-content-between">
+                                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="submit" class="btn btn-warning text-white">Save changes</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            }
+        }
+    </div>
+</div>
+

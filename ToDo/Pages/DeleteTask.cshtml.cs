@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using System;
 using System.ComponentModel.DataAnnotations;
 using ToDo.Repository;
 
@@ -24,7 +23,11 @@ namespace ToDo.Pages
                 if (ModelState.IsValid)
                 {
                     _repo.DeleteTask(GUID);
-                    return RedirectToPage("Index");
+                    if (string.IsNullOrWhiteSpace(HttpContext.Session.GetString("User")))
+                    {
+                        return RedirectToPage("Index");
+                    }
+                    return RedirectToPage("UserSite");
                 }
                 else
                 {

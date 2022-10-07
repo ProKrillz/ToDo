@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using System.Data;
 using ToDo.Models;
 using Microsoft.Extensions.Configuration;
+using System;
 
 namespace ToDo.DAL
 {
@@ -14,7 +15,7 @@ namespace ToDo.DAL
         public ConnectionDatabase()
         {
             _configuration = Configuration();
-            _connectionString = _configuration.GetConnectionString("LocalConnection");
+            _connectionString = _configuration.GetConnectionString("DefaultConnection");
             _sqlConnection = new SqlConnection(_connectionString);     
         }
         public IConfiguration Configuration()
@@ -39,13 +40,17 @@ namespace ToDo.DAL
             }
         }
         #region Users
-        public void AddUser(string firstname, string lastname, string username, string password)
+        /// <summary>
+        /// Add user to db
+        /// </summary>
+        /// <param name="user"></param>
+        public void AddUser(User user)
         {
             SqlCommand cmd = SqlCmd("CreateUser");
-            cmd.Parameters.AddWithValue("@Firstname", firstname);
-            cmd.Parameters.AddWithValue("@Lastname", lastname);
-            cmd.Parameters.AddWithValue("@Login", username);
-            cmd.Parameters.AddWithValue("@Password", password);
+            cmd.Parameters.AddWithValue("@Firstname", user.FirstName);
+            cmd.Parameters.AddWithValue("@Lastname", user.LastName);
+            cmd.Parameters.AddWithValue("@Username", user.Username);
+            cmd.Parameters.AddWithValue("@Password", user.GetPassword());
             try
             {
                 _sqlConnection.Open();
@@ -61,6 +66,14 @@ namespace ToDo.DAL
                 _sqlConnection.Close();
             }
         }
+        /// <summary>
+        /// Update user in db
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="firstname"></param>
+        /// <param name="lastname"></param>
+        /// <param name="username"></param>
+        /// <param name="password"></param>
         public void UpdateUser(int id, string firstname, string lastname, string username, string password)
         {
             SqlCommand cmd = SqlCmd("UpdateUser");
@@ -84,6 +97,10 @@ namespace ToDo.DAL
                 _sqlConnection.Close();
             }
         }
+        /// <summary>
+        /// Set user_deleted to 1 in db
+        /// </summary>
+        /// <param name="id"></param>
         public void DeleteUser(int id)
         {
             SqlCommand cmd = SqlCmd("DeleteUser");
@@ -103,6 +120,10 @@ namespace ToDo.DAL
                 _sqlConnection.Close();
             }
         }
+        /// <summary>
+        /// Get all users from Users in db
+        /// </summary>
+        /// <returns></returns>
         public List<User> GetAllUsers()
         {
             SqlCommand cmd = SqlCmd("GetAllUsers");
@@ -133,6 +154,48 @@ namespace ToDo.DAL
             }
             finally { _sqlConnection.Close(); }
         }
+        /// <summary>
+        /// Find specfic user from db
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public User GetUserById(int id)
+        {
+            SqlCommand cmd = SqlCmd("GetUserById");
+            cmd.Parameters.AddWithValue("@UserId", id);
+            try
+            {
+                _sqlConnection.Open();
+                SqlDataReader myReader = cmd.ExecuteReader();
+                User user;
+                if (myReader.HasRows)
+                {
+                    while (myReader.Read())
+                    {
+                        user = new(id,
+                            myReader.GetString("users_firstname"),
+                            myReader.GetString("users_lastname"),
+                            myReader.GetString("users_login"),
+                            myReader.GetString("users_password")); 
+                        return user;
+                    }
+                    
+                }
+                return null;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+            finally { _sqlConnection.Close(); }
+        }
+        /// <summary>
+        /// Login for user
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="password"></param>
+        /// <returns>user object with all values</returns>
         public User Login(string username, string password)
         {
             SqlCommand cmd = SqlCmd("UserLogin");
@@ -151,8 +214,8 @@ namespace ToDo.DAL
                             myReader.GetInt32("users_id"),
                             myReader.GetString("users_firstname"),
                             myReader.GetString("users_lastname"),
-                            myReader.GetString("users_login"),
-                            myReader.GetString("users_password")
+                            username,
+                            password
                             );
                     }
                 }
@@ -168,12 +231,17 @@ namespace ToDo.DAL
         }
         #endregion
         #region Tasks
-        public void CreateTask(string titel, string description, int priorities)
+        /// <summary>
+        /// Add task to db in Tasks
+        /// </summary>
+        /// <param name="task"></param>
+        public void CreateTask(ToDoTask task)
         {
             SqlCommand cmd = SqlCmd("AddTask");
-            cmd.Parameters.AddWithValue("@Titel", titel);
-            cmd.Parameters.AddWithValue("@Description", description);
-            cmd.Parameters.AddWithValue("@PrioritiesId", priorities);
+            cmd.Parameters.AddWithValue("@Id", task.GUID);
+            cmd.Parameters.AddWithValue("@Titel", task.Title);
+            cmd.Parameters.AddWithValue("@Description", task.Description);
+            cmd.Parameters.AddWithValue("@PrioritiesId", task.TaskPriority);
             try
             {
                 _sqlConnection.Open();
@@ -189,13 +257,17 @@ namespace ToDo.DAL
                 _sqlConnection.Close();
             }
         }
-        public void UpdateTask(int id, string titel, string description, int priorities)
+        /// <summary>
+        /// Update task in db on Tasks
+        /// </summary>
+        /// <param name="task"></param>
+        public void UpdateTask(ToDoTask task)
         {
             SqlCommand cmd = SqlCmd("UpdateTask");
-            cmd.Parameters.AddWithValue("@TaskId", id);
-            cmd.Parameters.AddWithValue("@Titel", titel);
-            cmd.Parameters.AddWithValue("@Description", description);
-            cmd.Parameters.AddWithValue("@PrioritiesId", priorities);
+            cmd.Parameters.AddWithValue("@TaskId", task.GUID);
+            cmd.Parameters.AddWithValue("@Titel", task.Title);
+            cmd.Parameters.AddWithValue("@Description", task.Description);
+            cmd.Parameters.AddWithValue("@PrioritiesId", task.TaskPriority);
             try
             {
                 _sqlConnection.Open();
@@ -211,10 +283,14 @@ namespace ToDo.DAL
                 _sqlConnection.Close();
             }
         }
-        public void DeleteTask(int id)
+        /// <summary>
+        /// Set task_deleted to 1 in db
+        /// </summary>
+        /// <param name="guid"></param>
+        public void DeleteTask(string guid)
         {
             SqlCommand cmd = SqlCmd("DeleteTask");
-            cmd.Parameters.AddWithValue("@TaskId", id);
+            cmd.Parameters.AddWithValue("@TaskId", guid);
             try
             {
                 _sqlConnection.Open();
@@ -227,10 +303,14 @@ namespace ToDo.DAL
             }
             finally { _sqlConnection.Close(); }
         }
-        public void CompletTask(int id) 
+        /// <summary>
+        /// Set task_completed to 1 in db
+        /// </summary>
+        /// <param name="guid"></param>
+        public void CompletTask(string guid) 
         {
             SqlCommand cmd = SqlCmd("CompletTask");
-            cmd.Parameters.AddWithValue("@TaskId", id);
+            cmd.Parameters.AddWithValue("@TaskId", guid);
             try
             {
                 _sqlConnection.Open();
@@ -243,7 +323,27 @@ namespace ToDo.DAL
             }
             finally { _sqlConnection.Close(); }
         }
-        public void AddUserToTask(int userId, int taskId)
+        public void DeleteAllCompletedTasks()
+        {
+            SqlCommand cmd = SqlCmd("DeleteAllCompletedTasks");
+            try
+            {
+                _sqlConnection.Open();
+                cmd.ExecuteNonQuery();
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+            finally { _sqlConnection.Close(); }
+        }
+        /// <summary>
+        /// Add userid and taskid to joiner tabler UsersTask
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="taskId">GUID</param>
+        public void AddUserToTask(int userId, string taskId)
         {
             SqlCommand cmd = SqlCmd("AddUserToTask");
             cmd.Parameters.AddWithValue("@UserId", userId);
@@ -263,6 +363,10 @@ namespace ToDo.DAL
                 _sqlConnection.Close();
             }
         }
+        /// <summary>
+        /// Get all task from db, used on index site
+        /// </summary>
+        /// <returns></returns>
         public List<ToDoTask> GetAllTask()
         {
             SqlCommand cmd = SqlCmd("GetAllTask");
@@ -273,13 +377,16 @@ namespace ToDo.DAL
                 List<ToDoTask> list = new List<ToDoTask>();
                 while (myReader.Read())
                 {
-                    list.Add(new ToDoTask(
-                        myReader.GetInt32("task_id"),
-                        myReader.GetString("task_titel"),
-                        myReader.GetString("task_description"),
-                        (ToDoTask.Priority)myReader.GetInt32("priorities_id"),
-                        myReader.GetDateTime("task_created")
-                        ));
+                    Guid.TryParse(myReader.GetString("task_id"), out Guid guid);
+                    list.Add(new ToDoTask
+                    {
+                        Title = myReader.GetString("task_title"),
+                        Description = myReader.GetString("task_description"),
+                        TaskPriority = (ToDoTask.Priority)myReader.GetInt32("priorities_id"),
+                        IsCompleted = myReader.GetBoolean("task_completed"),
+                        GUID = guid,
+                        Created = myReader.GetDateTime("task_created")
+                    });
                 }
                 return list;
             }
@@ -293,6 +400,11 @@ namespace ToDo.DAL
                 _sqlConnection.Close();
             }
         }
+        /// <summary>
+        /// Get all task from specific user
+        /// </summary>
+        /// <param name="id">User Id</param>
+        /// <returns></returns>
         public List<ToDoTask> GetAllTaskByUserId(int id)
         {
             SqlCommand cmd = SqlCmd("GetAllTaskById");
@@ -304,13 +416,15 @@ namespace ToDo.DAL
                 List<ToDoTask> list = new List<ToDoTask>();
                 while (myReader.Read())
                 {
-                    list.Add(new ToDoTask(
-                        myReader.GetInt32("task_id"),
-                        myReader.GetString("task_titel"),
-                        myReader.GetString("task_description"),
-                        (ToDoTask.Priority)myReader.GetInt32("priorities_id"),
-                        myReader.GetDateTime("task_created")
-                        )) ;
+                    Guid.TryParse(myReader.GetString("task_id"), out Guid guid);
+                    list.Add(new ToDoTask { 
+                        Title = myReader.GetString("task_title"),
+                        Description = myReader.GetString("task_description"),
+                        TaskPriority = (ToDoTask.Priority)myReader.GetInt32("priorities_id"),
+                        GUID=guid,
+                        IsCompleted = myReader.GetBoolean("task_completed"),
+                        Created = myReader.GetDateTime("task_created")
+                    }) ;
                 }
                 return list;
             }

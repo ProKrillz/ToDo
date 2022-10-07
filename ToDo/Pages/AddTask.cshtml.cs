@@ -23,29 +23,59 @@ namespace ToDo.Pages
             _repo = repo;
         }
 
-        public IActionResult OnGet(string title, string description, int priority)
+        public IActionResult OnGet(string title, string description, int priority, int id)
         {
-            try
+            if (id == 0)
             {
-                Title = title;
-                Description = description;
-                Priority = (ToDoTask.Priority)priority;
-                if (ModelState.IsValid)
+                try
                 {
-                    _repo.AddTask(new(Title, Description, Priority));
-                    return RedirectToPage("Index");
+                    Title = title;
+                    Description = description;
+                    Priority = (ToDoTask.Priority)priority;
+                    if (ModelState.IsValid)
+                    {
+                        _repo.AddTask(new(Title, Description, Priority) { Created = DateTime.Now });
+                        return RedirectToPage("Index");
+                    }
+                    else
+                    {
+                        string messages = string.Join("; ", ModelState.Values
+                                                .SelectMany(x => x.Errors)
+                                                .Select(x => x.ErrorMessage));
+                        return RedirectToPage("Index", new { error = messages });
+                    }
                 }
-                else
+                catch (Exception)
                 {
-                    string messages = string.Join("; ", ModelState.Values
-                                            .SelectMany(x => x.Errors)
-                                            .Select(x => x.ErrorMessage));
-                    return RedirectToPage("Index", new { error = messages });
+                    return RedirectToPage("Error");
                 }
             }
-            catch (Exception)
+            else
             {
-                return RedirectToPage("Error");
+                try
+                {
+                    Title = title;
+                    Description = description;
+                    Priority = (ToDoTask.Priority)priority;
+                    if (ModelState.IsValid)
+                    {
+                        ToDoTask task = new (Title, Description, Priority) { Created = DateTime.Now };
+                        _repo.AddTask(task);
+                        _repo.AddTaskToUser(task.GUID.ToString(), id);
+                        return RedirectToPage("UserSite");
+                    }
+                    else
+                    {
+                        string messages = string.Join("; ", ModelState.Values
+                                                .SelectMany(x => x.Errors)
+                                                .Select(x => x.ErrorMessage));
+                        return RedirectToPage("Index", new { error = messages });
+                    }
+                }
+                catch (Exception)
+                {
+                    return RedirectToPage("Error");
+                }
             }
         }
     }

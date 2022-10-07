@@ -52,7 +52,11 @@ namespace ToDo.Pages
                         TaskPriority = Priority,
                         IsCompleted = IsCompleted
                     });
-                    return RedirectToPage("Index");
+                    if (string.IsNullOrWhiteSpace(HttpContext.Session.GetString("User")))
+                    {
+                        return RedirectToPage("Index");
+                    }
+                    return RedirectToPage("UserSite");
                 }
                 else
                 {

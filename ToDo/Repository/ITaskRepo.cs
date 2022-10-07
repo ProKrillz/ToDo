@@ -10,6 +10,8 @@ namespace ToDo.Repository
         void DeleteTask(Guid guid);
         void EditTask(ToDoTask task);
         List<ToDoTask> GetAllTasks();
+        List<ToDoTask> GetAllTaskByUserId(int id);
         ToDoTask? GetTask(Guid guid);
+        void AddTaskToUser(string guid, int id);
     }
 }

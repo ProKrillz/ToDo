@@ -25,7 +25,11 @@ namespace ToDo.Pages
                 if (ModelState.IsValid)
                 {
                     _repo.CompleteTask(guid);
-                    return RedirectToPage("Index");
+                    if (string.IsNullOrWhiteSpace(HttpContext.Session.GetString("User")))
+                    {
+                        return RedirectToPage("Index");
+                    }
+                    return RedirectToPage("UserSite");
                 }
                 else
                 {

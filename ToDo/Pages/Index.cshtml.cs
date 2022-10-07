@@ -40,16 +40,22 @@ namespace ToDo.Pages
             ToDoTasks = repo.GetAllTasks();
         }
 
-        public void OnGet(string? error)
+        public IActionResult OnGet(string? error)
         {
+            if (string.IsNullOrWhiteSpace(HttpContext.Session.GetString("User")))
+            {
+                return RedirectToPage("LoginSite");
+            }
+
             Error = error;
+            return Page();
         }
 
         public IActionResult OnPostAdd()
         {
             if (ModelState.IsValid)
             {
-                return RedirectToPage("AddTask", new { title = Title, description = Description, priority = (int)Priority });
+                return RedirectToPage("AddTask", new { title = Title, description = Description, priority = (int)Priority, id = 0 });
             }
             else
             {
@@ -82,7 +88,7 @@ namespace ToDo.Pages
             //}
             if (ModelState.IsValid)
             {
-                return RedirectToPage("UpdateTask", new { guid, title = Title, description = Description, priority = (int)Priority, isCompleted = IsCompleted });
+                return RedirectToPage("UpdateTask", new { guid, title = Title, description = Description, priority = (int)Priority, isCompleted = IsCompleted});
             }
             else
             {
